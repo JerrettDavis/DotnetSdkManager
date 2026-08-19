@@ -15,9 +15,9 @@ jobs:
       matrix:
         rid: [linux-x64, linux-arm64, win-x64, win-arm64, osx-x64, osx-arm64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -32,7 +32,7 @@ jobs:
       - name: Checksum
         run: sha256sum "dotnet-sdk-manager-${{ matrix.rid }}.zip" > "dotnet-sdk-manager-${{ matrix.rid }}.zip.sha256"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dotnet-sdk-manager-${{ matrix.rid }}
           path: |
@@ -43,9 +43,9 @@ jobs:
   nuget-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -61,7 +61,7 @@ jobs:
       - name: Push to NuGet.org
         run: dotnet nuget push "nupkg/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nuget-package
           path: nupkg/*
@@ -71,14 +71,14 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           pattern: dotnet-sdk-manager-*
           merge-multiple: true
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           generate_release_notes: true
