@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>dotnet-sdk-manager</AssemblyName>
+    <RootNamespace>DotnetSdkManager.Cli</RootNamespace>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-sdk-manager</ToolCommandName>
+    <PackageId>DotnetSdkManager.Tool</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>DotnetSdkManager contributors</Authors>
+    <Description>A user-scoped, secure .NET SDK version manager.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DotnetSdkManager.Core/DotnetSdkManager.Core.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

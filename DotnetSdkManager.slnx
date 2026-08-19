@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DotnetSdkManager.Cli/DotnetSdkManager.Cli.csproj" />
+    <Project Path="src/DotnetSdkManager.Core/DotnetSdkManager.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DotnetSdkManager.E2ETests/DotnetSdkManager.E2ETests.csproj" />
+    <Project Path="tests/DotnetSdkManager.IntegrationTests/DotnetSdkManager.IntegrationTests.csproj" />
+    <Project Path="tests/DotnetSdkManager.UnitTests/DotnetSdkManager.UnitTests.csproj" />
+  </Folder>
+</Solution>

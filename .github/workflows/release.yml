@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rid: [linux-x64, linux-arm64, win-x64, win-arm64, osx-x64, osx-arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Publish ${{ matrix.rid }}
+        run: ./scripts/publish.sh ${{ matrix.rid }}
+
+      - name: Archive
+        run: |
+          cd .artifacts/publish/${{ matrix.rid }}
+          zip -r "../../../dotnet-sdk-manager-${{ matrix.rid }}.zip" .
+
+      - name: Checksum
+        run: sha256sum "dotnet-sdk-manager-${{ matrix.rid }}.zip" > "dotnet-sdk-manager-${{ matrix.rid }}.zip.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-sdk-manager-${{ matrix.rid }}
+          path: |
+            dotnet-sdk-manager-${{ matrix.rid }}.zip
+            dotnet-sdk-manager-${{ matrix.rid }}.zip.sha256
+          retention-days: 30
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

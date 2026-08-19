@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.cs text diff=csharp
+*.csproj text
+*.props text
+*.slnx text
+
+*.png binary
+*.zip binary
