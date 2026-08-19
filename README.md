@@ -1,5 +1,9 @@
 # DotnetSdkManager
 
+[![CI](https://github.com/JerrettDavis/DotnetSdkManager/actions/workflows/ci.yml/badge.svg)](https://github.com/JerrettDavis/DotnetSdkManager/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/JerrettDavis/DotnetSdkManager/branch/main/graph/badge.svg)](https://codecov.io/gh/JerrettDavis/DotnetSdkManager)
+[![NuGet](https://img.shields.io/nuget/v/DotnetSdkManager.Tool.svg)](https://www.nuget.org/packages/DotnetSdkManager.Tool)
+
 `dotnet-sdk-manager` is a user-scoped .NET SDK installer, selector, and project pinning tool. It downloads SDK archives itself through `HttpClient`, verifies every archive with SHA-512, extracts into isolated version roots, and never modifies SDKs owned by an operating-system package manager.
 
 The source uses .NET 10 and C# 14. The canonical distribution is a RID-specific, self-contained executable, so the machine does not need a sufficiently new .NET runtime merely to run the manager. A .NET global-tool package is included as a convenience for machines that already have .NET 10.
@@ -83,6 +87,22 @@ The E2E suite uses Testcontainers to start an isolated HTTP release feed and a s
 - [`docs/testing.md`](docs/testing.md): test pyramid and local commands.
 - [`docs/original-plan.md`](docs/original-plan.md): the supplied plan, preserved verbatim.
 
+## Release process
+
+Pushing a `v*.*.*` tag runs [`.github/workflows/release.yml`](.github/workflows/release.yml), which:
+
+- Publishes self-contained, single-file binaries for `linux-x64`, `linux-arm64`, `win-x64`, `win-arm64`, `osx-x64`, and `osx-arm64`, with SHA-256 checksums, and attaches them to a GitHub release.
+- Packs `DotnetSdkManager.Tool` (with a `.snupkg` symbol package) at the tag's version and pushes it to NuGet.org.
+
+This requires two repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Used for |
+| --- | --- |
+| `NUGET_API_KEY` | `dotnet nuget push` in the release workflow |
+| `CODECOV_TOKEN` | Coverage upload in the CI workflow (unit + integration flags) |
+
+CI (`.github/workflows/ci.yml`) runs coverage uploads with `fail_ci_if_error: false`, so pushes/PRs stay green even before these secrets are configured.
+
 ## Status
 
-This repository is an implementation-ready reference release. Before publishing under a public package ID, choose a final product name, reserve package/repository names, establish signing and release provenance, and wire the release workflow to your organization’s signing infrastructure.
+This repository is an implementation-ready reference release. Before publishing under a public package ID, choose a final product name and reserve package/repository names. Signing and release provenance (SBOM, artifact signing) are not yet wired up.

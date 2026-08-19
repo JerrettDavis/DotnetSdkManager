@@ -30,15 +30,44 @@ jobs:
         run: dotnet build DotnetSdkManager.slnx --no-restore --configuration Release
 
       - name: Unit tests
-        run: dotnet test tests/DotnetSdkManager.UnitTests/DotnetSdkManager.UnitTests.csproj --no-build --configuration Release --logger trx --results-directory TestResults
+        run: >
+          dotnet test tests/DotnetSdkManager.UnitTests/DotnetSdkManager.UnitTests.csproj
+          --no-build --configuration Release
+          --logger trx --results-directory TestResults/unit
+          --collect:"XPlat Code Coverage"
 
       - name: Integration tests
-        run: dotnet test tests/DotnetSdkManager.IntegrationTests/DotnetSdkManager.IntegrationTests.csproj --no-build --configuration Release --logger trx --results-directory TestResults
+        run: >
+          dotnet test tests/DotnetSdkManager.IntegrationTests/DotnetSdkManager.IntegrationTests.csproj
+          --no-build --configuration Release
+          --logger trx --results-directory TestResults/integration
+          --collect:"XPlat Code Coverage"
 
       - name: E2E tests (Testcontainers)
         env:
           RUN_E2E: "1"
-        run: dotnet test tests/DotnetSdkManager.E2ETests/DotnetSdkManager.E2ETests.csproj --no-build --configuration Release --logger trx --results-directory TestResults
+        run: >
+          dotnet test tests/DotnetSdkManager.E2ETests/DotnetSdkManager.E2ETests.csproj
+          --no-build --configuration Release
+          --logger trx --results-directory TestResults/e2e
+
+      - name: Upload coverage (unit)
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: TestResults/unit/**/coverage.cobertura.xml
+          flags: unit
+          fail_ci_if_error: false
+
+      - name: Upload coverage (integration)
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: TestResults/integration/**/coverage.cobertura.xml
+          flags: integration
+          fail_ci_if_error: false
 
       - name: Upload test results
         if: always()

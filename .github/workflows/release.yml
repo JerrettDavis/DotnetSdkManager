@@ -40,6 +40,33 @@ jobs:
             dotnet-sdk-manager-${{ matrix.rid }}.zip.sha256
           retention-days: 30
 
+  nuget-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Pack
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          dotnet pack src/DotnetSdkManager.Cli/DotnetSdkManager.Cli.csproj \
+            --configuration Release \
+            -p:Version="$version" \
+            --include-symbols -p:SymbolPackageFormat=snupkg \
+            --output nupkg
+
+      - name: Push to NuGet.org
+        run: dotnet nuget push "nupkg/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: nupkg/*
+          retention-days: 30
+
   github-release:
     needs: publish
     runs-on: ubuntu-latest
@@ -47,6 +74,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
+          pattern: dotnet-sdk-manager-*
           merge-multiple: true
 
       - name: Create release
