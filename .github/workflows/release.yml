@@ -21,6 +21,9 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Make publish script executable
+        run: chmod +x ./scripts/publish.sh
+
       - name: Publish ${{ matrix.rid }}
         run: ./scripts/publish.sh ${{ matrix.rid }}
 
@@ -59,7 +62,6 @@ jobs:
           dotnet pack src/DotnetSdkManager.Cli/DotnetSdkManager.Cli.csproj \
             --configuration Release \
             -p:Version="$version" \
-            --include-symbols -p:SymbolPackageFormat=snupkg \
             --output nupkg
 
       - name: NuGet login
